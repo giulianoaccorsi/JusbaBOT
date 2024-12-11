@@ -7,14 +7,25 @@ async function createBaileysClient() {
 
   const sock = makeWASocket({
     auth: state,
-    // Ajuste o nível de log aqui. Por exemplo: error só mostra erros graves.
-    logger: pino({ level: "error" }),
+    logger: pino({ level: "debug" }),
   });
 
   sock.ev.on("connection.update", (update) => {
-    const { connection, qr } = update;
+    const { connection, lastDisconnect } = update;
     if (connection === "open") {
       console.log("Conectado ao WhatsApp!");
+    } else if (connection === "close") {
+      const shouldReconnect =
+        lastDisconnect.error &&
+        lastDisconnect.error.output &&
+        lastDisconnect.error.output.statusCode !== 401;
+      if (shouldReconnect) {
+        createBaileysClient();
+      } else {
+        console.error(
+          "Conexão fechada e não será tentada a reconexão automática"
+        );
+      }
     }
   });
 
