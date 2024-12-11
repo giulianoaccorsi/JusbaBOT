@@ -1,3 +1,5 @@
+const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
+
 class RevealCommand {
   constructor() {
     this.command = "!revelar";
@@ -28,20 +30,24 @@ class RevealCommand {
     const realMsg = viewOnceObj.message;
     let content;
 
+    // Função para baixar o conteúdo da mensagem
+    const downloadMedia = async (mediaMessage, mediaType) => {
+      const stream = await downloadContentFromMessage(mediaMessage, mediaType);
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
+      return buffer;
+    };
+
     if (realMsg.imageMessage) {
-      const buffer = await sock.downloadMediaMessage({
-        message: { imageMessage: realMsg.imageMessage },
-      });
+      const buffer = await downloadMedia(realMsg.imageMessage, "image");
       content = { image: buffer, caption: realMsg.imageMessage.caption || "" };
     } else if (realMsg.videoMessage) {
-      const buffer = await sock.downloadMediaMessage({
-        message: { videoMessage: realMsg.videoMessage },
-      });
+      const buffer = await downloadMedia(realMsg.videoMessage, "video");
       content = { video: buffer, caption: realMsg.videoMessage.caption || "" };
     } else if (realMsg.audioMessage) {
-      const buffer = await sock.downloadMediaMessage({
-        message: { audioMessage: realMsg.audioMessage },
-      });
+      const buffer = await downloadMedia(realMsg.audioMessage, "audio");
       content = { audio: buffer, mimetype: "audio/ogg", ptt: true };
     } else {
       await sock.sendMessage(jid, {
