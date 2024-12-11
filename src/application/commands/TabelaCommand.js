@@ -17,7 +17,6 @@ class TabelaCommand {
         return;
       }
 
-      // Ordena do maior para o menor pontos
       tabela.sort((a, b) => {
         const pontosA = parseInt(a["Pontos"], 10) || 0;
         const pontosB = parseInt(b["Pontos"], 10) || 0;
@@ -26,11 +25,10 @@ class TabelaCommand {
 
       let textoResposta = "*PokeEmpaticos 🏆*\n\n";
 
-      // Aqui usamos o índice do for para definir a colocação
       for (let i = 0; i < tabela.length; i++) {
         const linha = tabela[i];
 
-        const posicao = i + 1; // i inicia em 0, portanto colocação é i+1
+        const posicao = i + 1;
         const nome = linha["Nome"] || "Desconhecido";
         const vitorias = linha["Vitórias"] || "0";
         const empates = linha["Empates"] || "0";

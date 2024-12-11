@@ -16,7 +16,6 @@ const {
     userMentionService
   );
 
-  // Quando estiver conectado, configurar o controle de mensagem
   sock.ev.on("connection.update", (update) => {
     const { connection } = update;
     if (connection === "open") {

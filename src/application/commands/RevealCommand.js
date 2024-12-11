@@ -18,45 +18,72 @@ class RevealCommand {
 
     const quoted = contextInfo.quotedMessage;
 
-    // Verifica se é viewOnceMessage ou viewOnceMessageV2
-    if (!quoted.viewOnceMessage && !quoted.viewOnceMessageV2) {
+    const viewOnceObj =
+      quoted.viewOnceMessageV2Extension ||
+      quoted.viewOnceMessageV2 ||
+      quoted.viewOnceMessage;
+
+    if (!viewOnceObj) {
       await sock.sendMessage(jid, {
         text: "A mensagem citada não é de visualização única.",
       });
       return;
     }
 
-    const viewOnceObj = quoted.viewOnceMessageV2 || quoted.viewOnceMessage;
     const realMsg = viewOnceObj.message;
     let content;
 
-    // Função para baixar o conteúdo da mensagem
     const downloadMedia = async (mediaMessage, mediaType) => {
-      const stream = await downloadContentFromMessage(mediaMessage, mediaType);
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
+      try {
+        const stream = await downloadContentFromMessage(
+          mediaMessage,
+          mediaType
+        );
+        let buffer = Buffer.from([]);
+        for await (const chunk of stream) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+        return buffer;
+      } catch (error) {
+        console.error(`Erro ao baixar mídia (${mediaType}):`, error);
+        throw new Error("Falha ao processar a mídia citada.");
       }
-      return buffer;
     };
 
-    if (realMsg.imageMessage) {
-      const buffer = await downloadMedia(realMsg.imageMessage, "image");
-      content = { image: buffer, caption: realMsg.imageMessage.caption || "" };
-    } else if (realMsg.videoMessage) {
-      const buffer = await downloadMedia(realMsg.videoMessage, "video");
-      content = { video: buffer, caption: realMsg.videoMessage.caption || "" };
-    } else if (realMsg.audioMessage) {
-      const buffer = await downloadMedia(realMsg.audioMessage, "audio");
-      content = { audio: buffer, mimetype: "audio/ogg", ptt: true };
-    } else {
-      await sock.sendMessage(jid, {
-        text: "Tipo de mensagem viewOnce não suportado.",
-      });
-      return;
-    }
+    try {
+      if (realMsg.audioMessage) {
+        const buffer = await downloadMedia(realMsg.audioMessage, "audio");
+        content = {
+          audio: buffer,
+          mimetype: realMsg.audioMessage.mimetype || "audio/ogg",
+          ptt: realMsg.audioMessage.ptt || false,
+        };
+      } else if (realMsg.imageMessage) {
+        const buffer = await downloadMedia(realMsg.imageMessage, "image");
+        content = {
+          image: buffer,
+          caption: realMsg.imageMessage.caption || "",
+        };
+      } else if (realMsg.videoMessage) {
+        const buffer = await downloadMedia(realMsg.videoMessage, "video");
+        content = {
+          video: buffer,
+          caption: realMsg.videoMessage.caption || "",
+        };
+      } else {
+        await sock.sendMessage(jid, {
+          text: "Tipo de mensagem viewOnce não suportado.",
+        });
+        return;
+      }
 
-    await sock.sendMessage(jid, content);
+      await sock.sendMessage(jid, content);
+    } catch (err) {
+      console.error("Erro ao processar o comando '!revelar':", err);
+      await sock.sendMessage(jid, {
+        text: "Ocorreu um erro ao tentar revelar a mensagem.",
+      });
+    }
   }
 }
 

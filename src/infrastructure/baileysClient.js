@@ -15,7 +15,6 @@ async function createBaileysClient() {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
-      // Gera o QR Code no terminal
       console.log("Escaneie o QR Code abaixo para se conectar:");
       qrcode.generate(qr, { small: true });
     }
