@@ -8,7 +8,7 @@ const RevealCommand = require("./commands/RevealCommand");
 const GPTCommand = require("./commands/GPTCommand");
 
 class CommandHandler {
-  constructor(brasileiraoService, userMentionService) {
+  constructor(userMentionService) {
     const markAllCmd = new MarkAllCommand(userMentionService);
     const pingCmd = new PingCommand();
     const shutdownCmd = new ShutdownCommand();
