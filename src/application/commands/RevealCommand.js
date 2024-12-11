@@ -16,34 +16,32 @@ class RevealCommand {
 
     const quoted = contextInfo.quotedMessage;
 
-    if (!quoted.viewOnceMessage) {
+    // Verifica se é viewOnceMessage ou viewOnceMessageV2
+    if (!quoted.viewOnceMessage && !quoted.viewOnceMessageV2) {
       await sock.sendMessage(jid, {
         text: "A mensagem citada não é de visualização única.",
       });
       return;
     }
 
-    const realMsg = quoted.viewOnceMessage.message;
+    const viewOnceObj = quoted.viewOnceMessageV2 || quoted.viewOnceMessage;
+    const realMsg = viewOnceObj.message;
     let content;
 
     if (realMsg.imageMessage) {
-      // Imagem
       const buffer = await sock.downloadMediaMessage({
         message: { imageMessage: realMsg.imageMessage },
       });
       content = { image: buffer, caption: realMsg.imageMessage.caption || "" };
     } else if (realMsg.videoMessage) {
-      // Vídeo
       const buffer = await sock.downloadMediaMessage({
         message: { videoMessage: realMsg.videoMessage },
       });
       content = { video: buffer, caption: realMsg.videoMessage.caption || "" };
     } else if (realMsg.audioMessage) {
-      // Áudio
       const buffer = await sock.downloadMediaMessage({
         message: { audioMessage: realMsg.audioMessage },
       });
-      // Se quiser marcar como áudio de voz (PTT), inclua `ptt: true`
       content = { audio: buffer, mimetype: "audio/ogg", ptt: true };
     } else {
       await sock.sendMessage(jid, {
