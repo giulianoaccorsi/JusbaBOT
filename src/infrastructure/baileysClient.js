@@ -7,8 +7,6 @@ async function createBaileysClient() {
 
   const sock = makeWASocket({
     auth: state,
-    // Ajuste o nível de log aqui. Por exemplo: error só mostra erros graves.
-    logger: pino({ level: "error" }),
   });
 
   sock.ev.on("connection.update", (update) => {
