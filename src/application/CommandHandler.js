@@ -5,6 +5,7 @@ const PingCommand = require("./commands/PingCommand");
 const ShutdownCommand = require("./commands/ShutdownCommand");
 const TabelaService = require("./services/TabelaService");
 const TabelaCommand = require("./commands/TabelaCommand");
+const RevealCommand = require("./commands/RevealCommand");
 
 class CommandHandler {
   constructor(brasileiraoService, userMentionService) {
@@ -14,6 +15,7 @@ class CommandHandler {
     const shutdownCmd = new ShutdownCommand();
     const tabelaService = new TabelaService();
     const tabelaCmd = new TabelaCommand(tabelaService);
+    const revealCmd = new RevealCommand();
 
     this.commands = {
       [markAllCmd.command]: markAllCmd,
@@ -21,6 +23,7 @@ class CommandHandler {
       [pingCmd.command]: pingCmd,
       [shutdownCmd.command]: shutdownCmd,
       [tabelaCmd.command]: tabelaCmd,
+      [revealCmd.command]: revealCmd,
     };
   }
 
