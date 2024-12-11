@@ -1,5 +1,4 @@
 const { createBaileysClient } = require("./src/infrastructure/baileysClient");
-const BrasileiraoService = require("./src/application/services/BrasileiraoService");
 const UserMentionService = require("./src/application/services/UserMentionService");
 const CommandHandler = require("./src/application/CommandHandler");
 const {
@@ -9,12 +8,8 @@ const {
 (async () => {
   const sock = await createBaileysClient();
 
-  const brasileiraoService = new BrasileiraoService();
   const userMentionService = new UserMentionService();
-  const commandHandler = new CommandHandler(
-    brasileiraoService,
-    userMentionService
-  );
+  const commandHandler = new CommandHandler(userMentionService);
 
   sock.ev.on("connection.update", (update) => {
     const { connection } = update;
