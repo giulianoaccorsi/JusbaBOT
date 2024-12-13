@@ -1,6 +1,7 @@
 const makeWASocket = require("@whiskeysockets/baileys").default;
 const { useMultiFileAuthState } = require("@whiskeysockets/baileys");
-const qrcode = require("qrcode-terminal"); // Biblioteca para gerar QR Code no console
+const { setupMessageController } = require("../presentation/messageController");
+const qrcode = require("qrcode-terminal");
 const pino = require("pino");
 
 async function createBaileysClient(commandHandler) {
