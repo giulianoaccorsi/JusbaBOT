@@ -1,26 +1,18 @@
 const { createBaileysClient } = require("./src/infrastructure/baileysClient");
 const UserMentionService = require("./src/application/services/UserMentionService");
 const CommandHandler = require("./src/application/CommandHandler");
+const express = require("express");
 const {
   setupMessageController,
 } = require("./src/presentation/messageController");
 
 (async () => {
-  const sock = await createBaileysClient();
-
   const userMentionService = new UserMentionService();
   const commandHandler = new CommandHandler(userMentionService);
 
-  sock.ev.on("connection.update", (update) => {
-    const { connection } = update;
-    if (connection === "open") {
-      setupMessageController(sock, commandHandler);
-      console.log("Bot iniciado e aguardando mensagens...");
-    }
-  });
+  await createBaileysClient(commandHandler);
 })();
 
-const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => res.send("Bot rodando!"));

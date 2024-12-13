@@ -3,7 +3,7 @@ const { useMultiFileAuthState } = require("@whiskeysockets/baileys");
 const qrcode = require("qrcode-terminal"); // Biblioteca para gerar QR Code no console
 const pino = require("pino");
 
-async function createBaileysClient() {
+async function createBaileysClient(commandHandler) {
   const { state, saveCreds } = await useMultiFileAuthState("auth_info");
 
   const sock = makeWASocket({
@@ -21,6 +21,8 @@ async function createBaileysClient() {
 
     if (connection === "open") {
       console.log("Conectado ao WhatsApp!");
+      setupMessageController(sock, commandHandler);
+      console.log("Bot iniciado e aguardando mensagens...");
     } else if (connection === "close") {
       const shouldReconnect =
         lastDisconnect.error &&
@@ -28,7 +30,7 @@ async function createBaileysClient() {
         lastDisconnect.error.output.statusCode !== 401;
       if (shouldReconnect) {
         console.log("Tentando reconexão...");
-        createBaileysClient();
+        createBaileysClient(commandHandler);
       } else {
         console.error(
           "Conexão fechada e não será tentada a reconexão automática"
