@@ -20,7 +20,13 @@ class TabelaCommand {
       tabela.sort((a, b) => {
         const pontosA = parseInt(a["Pontos"], 10) || 0;
         const pontosB = parseInt(b["Pontos"], 10) || 0;
-        return pontosB - pontosA;
+        const saldoA = parseInt(a["Saldo Final"], 10) || 0;
+        const saldoB = parseInt(b["Saldo Final"], 10) || 0;
+
+        if (pontosB !== pontosA) {
+          return pontosB - pontosA;
+        }
+        return saldoB - saldoA;
       });
 
       let textoResposta = "*PokeEmpaticos 🏆*\n\n";
@@ -34,7 +40,7 @@ class TabelaCommand {
         const empates = linha["Empates"] || "0";
         const derrotas = linha["Derrotas"] || "0";
         const pontos = linha["Pontos"] || "0";
-        const saldo = linha["Saldo"] || "0";
+        const saldo = linha["Saldo Final"] || "0";
 
         textoResposta +=
           `*${posicao}º* ${nome}\n` +

@@ -6,6 +6,7 @@ const TabelaService = require("./services/TabelaService");
 const TabelaCommand = require("./commands/TabelaCommand");
 const RevealCommand = require("./commands/RevealCommand");
 const GPTCommand = require("./commands/GPTCommand");
+const NextCommand = require("./commands/NextCommand");
 
 class CommandHandler {
   constructor(userMentionService) {
@@ -16,6 +17,7 @@ class CommandHandler {
     const tabelaCmd = new TabelaCommand(tabelaService);
     const revealCmd = new RevealCommand();
     const gptCmd = new GPTCommand();
+    const nextCmd = new NextCommand(tabelaService);
 
     this.commands = {
       [markAllCmd.command]: markAllCmd,
@@ -24,6 +26,7 @@ class CommandHandler {
       [tabelaCmd.command]: tabelaCmd,
       [revealCmd.command]: revealCmd,
       [gptCmd.command]: gptCmd,
+      [nextCmd.command]: nextCmd,
     };
 
     this.blockedUsers = ["5511958072575@s.whatsapp.net"];
